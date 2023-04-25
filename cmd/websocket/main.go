@@ -1,9 +1,12 @@
 package main
 
 import (
+	"github.com/sccotJiang/wsj/internal/entities/namespaces"
+	"github.com/sccotJiang/wsj/internal/websocket/service"
 	"log"
 	"os"
 	"os/signal"
+	"sync"
 	"syscall"
 	"time"
 )
@@ -14,7 +17,7 @@ func init() {
 
 func main() {
 	go listenSyscall()
-	<-time.After(time.Second * 50)
+	<-time.After(time.Second * 10)
 }
 
 //监听系统信号
@@ -29,6 +32,13 @@ func listenSyscall() {
 	select {
 	case sig := <-sigc:
 		log.Printf("receive system signal %v, start terminating", sig)
-
+		wg := sync.WaitGroup{}
+		for _, n := range namespaces.Namespaces {
+			wg.Add(1)
+			go service.GraceTerminate(n, &wg)
+		}
+		wg.Wait()
+		log.Println("finish terminating")
+		os.Exit(3)
 	}
 }
