@@ -5,3 +5,6 @@ type IUser interface {
 	SetLastPing(time int64)
 	GetLastPing() int64
 }
+type BaseUser struct {
+	UserId string `json:"userid"`
+}

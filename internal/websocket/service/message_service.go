@@ -4,10 +4,10 @@ import (
 	"encoding/json"
 	"github.com/sccotJiang/wsj/internal/entities/message"
 	"github.com/sccotJiang/wsj/internal/entities/namespaces"
+	messageService "github.com/sccotJiang/wsj/internal/service/messgae"
 	"github.com/sccotJiang/wsj/internal/websocket/entities/client"
 	"log"
 	"runtime"
-	messageService "github.com/sccotJiang/wsj/internal/service/messgae"
 )
 
 func sendUserChat(c client.IClient, byteMsg []byte, chatType string) {
@@ -20,13 +20,13 @@ func sendUserChat(c client.IClient, byteMsg []byte, chatType string) {
 	}()
 	var chatMsg message.ChatMessage
 	err := json.Unmarshal(byteMsg, &chatMsg)
-	if err != nil || len(chatMsg.MsgBody) <=0 {
-		log.Printf("sendUserChat wrong %v pr MsgBody length %v",err, len(chatMsg.MsgBody))
+	if err != nil || len(chatMsg.MsgBody) <= 0 {
+		log.Printf("sendUserChat wrong %v pr MsgBody length %v", err, len(chatMsg.MsgBody))
 		return
 	}
-	if chatType == "publicChat" {//公聊
-		messageService.PubMessage(namespaces.CALLER, message.TypeNormal, message.SubTypePublicChat,c.GetId(),byteMsg,[]string{})
-	} else {//私聊
-		messageService.PubMessage(namespaces.CALLER, message.TypeNormal, message.SubTypePrivateChat,c.GetId(),byteMsg,[]string{chatMsg.TargetUserid})
+	if chatType == "publicChat" { //公聊
+		messageService.PubGlobalMessage(namespaces.CALLER, message.TypeNormal, message.SubTypePublicChat, c.GetId(), byteMsg, []string{})
+	} else { //私聊
+		messageService.PubPrivateMessage(namespaces.CALLER, message.TypeNormal, message.SubTypePrivateChat, c.GetId(), byteMsg, chatMsg.TargetUserid)
 	}
 }

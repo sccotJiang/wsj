@@ -1,6 +1,6 @@
 package message
 
 type ChatMessage struct {
-	BaseChatMessage
+	BaseMessage
 	TargetUserid string `json:"target_userid"`
 }

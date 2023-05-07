@@ -9,12 +9,14 @@ import (
 type IClient interface {
 	GetId() string
 	GetNamespace() string
+	GetUser() user.IUser
 }
 type baseClient struct {
-	Id   string
-	Conn *websocket.Conn
-	User user.IUser
-	Ping chan byte
+	Id     string
+	Conn   *websocket.Conn
+	User   user.IUser
+	Ping   chan byte
+	Sender chan []byte
 }
 
 func (c *baseClient) GetId() string {
@@ -22,4 +24,7 @@ func (c *baseClient) GetId() string {
 }
 func (c *baseClient) GetNamespace() string {
 	return c.GetNamespace()
+}
+func (c *baseClient) GetUser() user.IUser {
+	return c.User
 }

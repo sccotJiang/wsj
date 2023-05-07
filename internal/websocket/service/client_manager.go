@@ -5,6 +5,7 @@ import (
 	"github.com/sccotJiang/wsj/internal/websocket/entities/client"
 	"log"
 	"sync"
+	"time"
 )
 
 type ClientManager struct {
@@ -29,8 +30,14 @@ func (cm *ClientManager) ManageClient() {
 			log.Printf("manager Register for %v:%v", namespace, c.GetId())
 			switch namespace {
 			case namespaces.CALLER:
+				go ReadClient(c.(*client.CjClient))
+				go WriteClient(c.(*client.CjClient))
 			}
-			//case c := <-cm.Unregister: //断开连接的用户
+		case c := <-cm.Unregister: //断开连接的用户
+			log.Printf("manager unregister:%v", c.GetId())
+			if time.Now().Unix()-c.GetUser().GetLastPing() >= 45 {
+				ForceRecycle(c)
+			}
 		}
 	}
 }
@@ -46,4 +53,10 @@ func InitClientManager() {
 
 func GraceTerminate(namespace string, wg *sync.WaitGroup) {
 	defer wg.Done()
+}
+
+// ForceRecycle 强制回收
+func ForceRecycle(c client.IClient) {
+	switch c.GetNamespace() {
+	}
 }

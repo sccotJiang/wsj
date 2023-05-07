@@ -1,9 +1,13 @@
 package main
 
 import (
+	"flag"
+	"fmt"
 	"github.com/sccotJiang/wsj/internal/entities/namespaces"
+	"github.com/sccotJiang/wsj/internal/websocket/server"
 	"github.com/sccotJiang/wsj/internal/websocket/service"
 	"log"
+	"net/http"
 	"os"
 	"os/signal"
 	"sync"
@@ -12,11 +16,25 @@ import (
 )
 
 func init() {
-
+	go listenSyscall()
+	//定义命令行参数对应的变量
+	var cliName = flag.String("name", "默认姓名", "输入你的姓名")
+	flag.Parse() //把用户传递的命令行参数解析为对应变量的值 go run main.go -name=1212
+	fmt.Printf("args=%s, num=%d\n", flag.Args(), flag.NArg())
+	for i := 0; i != flag.NArg(); i++ {
+		fmt.Printf("arg[%d]=%s\n", i, flag.Arg(i))
+	}
+	fmt.Println("name=", *cliName)
+	//初始化环境
+	server.InitEnv()
+	//初始化组件
+	server.InitInternalServer()
 }
 
 func main() {
-	go listenSyscall()
+	http.HandleFunc("/ws/caller", func(w http.ResponseWriter, r *http.Request) {
+		server.InternalManager{}
+	})
 	<-time.After(time.Second * 10)
 }
 
