@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <title>Some unimportant html </title>
+</head>
+<body>
+
+<script>
+    let socket = new WebSocket("ws://localhost:9999/ws/caller");
+    console.log("Websocket started.");
+    socket.onOpen = () => {
+        console.log("Client started.");
+    }
+    socket.onclose = (event) => {
+        console.log("Socket closed: ", event);
+    }
+    socket.onError = (error) => {
+        console.log("Socket Error: ", error);
+    }
+    socket.onMessage = (msg) => {
+        console.log(msg);
+    }
+</script>
+</body>
+</html>
